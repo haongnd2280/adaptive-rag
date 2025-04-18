@@ -1,0 +1,33 @@
+[project]
+name = "adaptive-rag"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "haongnd2280", email = "hao.ngnd2285@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "bs4>=0.0.2",
+    "chromadb>=1.0.5",
+    "dotenv>=0.9.9",
+    "langchain>=0.3.23",
+    "langchain-community>=0.3.21",
+    "langchain-core>=0.3.54",
+    "langchain-openai>=0.3.14",
+    "langgraph>=0.3.31",
+    "pydantic>=2.11.3",
+]
+
+[project.scripts]
+adaptive-rag = "adaptive_rag:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+    "ipython>=9.1.0",
+]
