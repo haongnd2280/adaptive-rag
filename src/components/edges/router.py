@@ -10,6 +10,9 @@ from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 load_dotenv()
 
+from utils import trace
+from components.state import State
+
 
 # Data model
 class RouteQuery(BaseModel):
@@ -17,7 +20,7 @@ class RouteQuery(BaseModel):
 
     # TODO: Add a value indicating the model should answer the question by itself
 
-    datasource: Literal["vectorstore", "web_search"] = Field(
+    data_src: Literal["vectorstore", "web_search"] = Field(
         ...,
         description="Given a user question choose to route it to web search or a vectorstore.",
     )
@@ -38,7 +41,34 @@ route_prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
+# Create runnable
 question_router = route_prompt | structured_llm_router
+
+
+@trace("edge")
+def router(state: State, verbose: bool = True) -> Literal["web_search", "vectorstore"]:
+    """
+    Route question to web search or RAG.
+
+    Args:
+        state (dict): The current graph state
+
+    Returns:
+        str: Next node to call
+    """
+
+    question = state["question"]
+    source = question_router.invoke({"question": question})
+
+    if source.data_src == "web_search":
+        src = "web_search"
+    elif source.data_src == "vectorstore":
+        src = "vectorstore"
+
+    if verbose:
+        print(f"Routing question '{question}' to {src}")
+
+    return src
 
 
 if __name__ == "__main__":

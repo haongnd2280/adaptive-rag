@@ -8,7 +8,9 @@ from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 load_dotenv()
 
-from adaptive_rag.index import retriever
+from utils import trace
+from tools import retriever
+from components.state import State
 
 
 # Data model
@@ -37,6 +39,40 @@ grade_prompt = ChatPromptTemplate.from_messages(
 )
 
 retrieval_grader = grade_prompt | structured_llm_grader
+
+
+@trace("node")
+def grade_documents(state: State) -> State:
+    """
+    Determines whether the retrieved documents are relevant to the question.
+
+    Args:
+        state (dict): The current graph state
+
+    Returns:
+        state (dict): Updates documents key with only filtered relevant documents
+    """
+
+    question = state["question"]
+    documents = state["documents"]
+
+    # Score each doc
+    filtered_docs = []
+    for doc in documents:
+        score = retrieval_grader.invoke(
+            {
+                "question": question,
+                "document": doc.page_content
+            }
+        )
+        grade = score.binary_score
+        if grade == "yes":
+            filtered_docs.append(doc)
+
+    return {
+        "question": question,
+        "documents": filtered_docs
+    }
 
 
 if __name__ == "__main__":
