@@ -1,5 +1,4 @@
-### Retrieval Grader
-
+import yaml
 from pydantic import BaseModel, Field
 
 from langchain_openai import ChatOpenAI
@@ -13,6 +12,16 @@ from tools import retriever
 from components.state import State
 
 
+file_path = "../llm_config.yaml"
+with open(file_path, "r") as f:
+    llm_config = yaml.safe_load(f)
+
+# LLM
+llm = ChatOpenAI(
+    model_name=llm_config["filter"]["model"],
+    temperature=llm_config["filter"]["temperature"],
+)
+
 # Data model
 class GradeDocuments(BaseModel):
     """Binary score for relevance check on retrieved documents."""
@@ -21,9 +30,7 @@ class GradeDocuments(BaseModel):
         description="Documents are relevant to the question, 'yes' or 'no'"
     )
 
-
 # LLM with function call
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 structured_llm_grader = llm.with_structured_output(GradeDocuments)
 
 # Prompt
@@ -42,7 +49,7 @@ retrieval_grader = grade_prompt | structured_llm_grader
 
 
 @trace("node")
-def grade_documents(state: State) -> State:
+def grade(state: State) -> State:
     """
     Determines whether the retrieved documents are relevant to the question.
 

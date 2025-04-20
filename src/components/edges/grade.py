@@ -1,5 +1,6 @@
 from typing import Literal
 
+import yaml
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 load_dotenv()
@@ -12,10 +13,21 @@ from utils import trace
 from components.state import State
 
 
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+file_path = "../llm_config.yaml"
+with open(file_path, "r") as f:
+    llm_config = yaml.safe_load(f)
 
+# LLMs
+grader_llm = ChatOpenAI(
+    model_name=llm_config["answer"]["model"],
+    temperature=llm_config["answer"]["temperature"],
+)
+hallu_llm = ChatOpenAI(
+    model_name=llm_config["hallu"]["model"],
+    temperature=llm_config["hallu"]["temperature"],
+)
 
-def create_answer_grader(llm: ChatOpenAI = llm) -> Runnable:
+def create_answer_grader(llm: ChatOpenAI = grader_llm) -> Runnable:
     # Data model
     class GradeAnswer(BaseModel):
         """Binary score to assess answer addresses question."""
@@ -40,7 +52,7 @@ def create_answer_grader(llm: ChatOpenAI = llm) -> Runnable:
     return answer_grader
 
 
-def create_hallu_grader(llm: ChatOpenAI = llm) -> Runnable:
+def create_hallu_grader(llm: ChatOpenAI = hallu_llm) -> Runnable:
     # Data model
     class GradeHallucinations(BaseModel):
         """Binary score for hallucination present in generation answer."""
@@ -71,7 +83,7 @@ hallu_grader = create_hallu_grader()
 
 
 @trace("edge")
-def grade_generation(
+def grade(
     state: State,
     verbose: bool = True
 ) -> Literal["hallucination", "ok", "not ok"]:

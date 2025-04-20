@@ -1,0 +1,27 @@
+router:
+  model: gpt-4.1-mini
+  temperature: 0.0
+
+filter:
+  model: gpt-4.1-mini
+  temperature: 0.0
+
+transform:
+  model: gpt-4.1-mini
+  temperature: 0.0
+
+generate:
+  model: gpt-4.1-mini
+  temperature: 0.0
+
+decide:
+  model: gpt-4.1-mini
+  temperature: 0.0
+
+answer:
+  model: gpt-4.1-mini
+  temperature: 0.0
+
+hallu:
+  model: gpt-4.1-mini
+  temperature: 0.0

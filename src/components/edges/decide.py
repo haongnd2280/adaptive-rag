@@ -5,7 +5,7 @@ from components.state import State
 
 
 @trace("edge")
-def decide_generation(state: State, verbose: bool = True) -> Literal["generate", "transform"]:
+def decide(state: State, verbose: bool = True) -> Literal["generate", "transform"]:
     """
     Determines whether to generate an answer, or re-generate a question
     based on the number of relevant documents.

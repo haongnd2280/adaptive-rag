@@ -1,3 +1,4 @@
+import yaml
 
 from langchain import hub
 from langchain_openai import ChatOpenAI
@@ -8,14 +9,20 @@ load_dotenv()
 
 from utils import trace
 from components.state import State
-from tools import retriever
 
+
+file_path = "../llm_config.yaml"
+with open(file_path, "r") as f:
+    llm_config = yaml.safe_load(f)
+
+# LLM
+llm = ChatOpenAI(
+    model_name=llm_config["generate"]["model"],
+    temperature=llm_config["generate"]["temperature"],
+)
 
 # Prompt
 prompt = hub.pull("rlm/rag-prompt")
-
-# LLM
-llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
 
 # Post-processing
 def format_docs(docs):

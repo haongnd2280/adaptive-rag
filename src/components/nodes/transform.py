@@ -1,4 +1,4 @@
-### Question Re-writer
+import yaml
 
 from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
@@ -11,8 +11,15 @@ from utils import trace
 from components.state import State
 
 
+file_path = "../llm_config.yaml"
+with open(file_path, "r") as f:
+    llm_config = yaml.safe_load(f)
+
 # LLM
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+llm = ChatOpenAI(
+    model_name=llm_config["transform"]["model"],
+    temperature=llm_config["transform"]["temperature"],
+)
 
 # Prompt
 system = """You a question re-writer that converts an input question to a better version that is optimized \n 
@@ -27,7 +34,7 @@ re_write_prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-question_rewriter = re_write_prompt | llm | StrOutputParser()
+rewriter = re_write_prompt | llm | StrOutputParser()
 
 
 @trace("node")
@@ -46,7 +53,7 @@ def transform(state: State) -> State:
     documents = state["documents"]
 
     # Re-write question
-    better_question = question_rewriter.invoke({"question": question})
+    better_question = rewriter.invoke({"question": question})
     return {
         "documents": documents,
         "question": better_question
@@ -55,4 +62,4 @@ def transform(state: State) -> State:
 
 if __name__ == "__main__":
     question = "memory agent"
-    print(question_rewriter.invoke({"question": question}))
+    print(rewriter.invoke({"question": question}))

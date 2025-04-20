@@ -25,10 +25,10 @@ def trace(
 
 
 def timer(
-    func: Callable[..., Any],
+    func: Function,
     *,
     disable: bool = False,
-) -> Callable[..., Any]:
+) -> Function:
     @wraps(func)
     def wrapper(*args, **kwargs):
         start = time.time()

@@ -1,7 +1,6 @@
-### Router
-
 from typing import Literal
 
+import yaml
 from pydantic import BaseModel, Field
 
 from langchain_openai import ChatOpenAI
@@ -13,6 +12,15 @@ load_dotenv()
 from utils import trace
 from components.state import State
 
+
+file_path = "../llm_config.yaml"
+with open(file_path, "r") as f:
+    llm_config = yaml.safe_load(f)
+
+llm = ChatOpenAI(
+    model_name=llm_config["router"]["name"],
+    temperature=llm_config["router"]["temperature"],
+)
 
 # Data model
 class RouteQuery(BaseModel):
@@ -27,7 +35,6 @@ class RouteQuery(BaseModel):
 
 
 # LLM with function call
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 structured_llm_router = llm.with_structured_output(RouteQuery)
 
 # Prompt
