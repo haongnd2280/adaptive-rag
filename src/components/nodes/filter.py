@@ -49,7 +49,7 @@ retrieval_grader = grade_prompt | structured_llm_grader
 
 
 @trace("node")
-def grade(state: State) -> State:
+def filter(state: State) -> State:
     """
     Determines whether the retrieved documents are relevant to the question.
 

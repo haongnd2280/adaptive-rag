@@ -7,6 +7,7 @@ from components.nodes import (
     filter,
     generate,
     transform,
+    llm,
 )
 from components.edges import (
     router,
@@ -22,7 +23,8 @@ workflow.add_node("web_search", web_search)       # web search
 workflow.add_node("retrieve", retrieve)           # retrieve
 workflow.add_node("filter", filter)               # filter documents
 workflow.add_node("generate", generate)           # generatae
-workflow.add_node("transform", transform)         # transform_query
+workflow.add_node("transform", transform)         # 
+workflow.add_node("llm", llm)              # LLM
 
 # Define edges
 # First edge is an router
@@ -32,8 +34,10 @@ workflow.add_conditional_edges(
     {
         "web_search": "web_search",
         "vectorstore": "retrieve",
+        "llm": "llm",
     },
 )
+workflow.add_edge("llm", END)
 # web_search based generation will not be checked
 workflow.add_edge("web_search", "generate")
 workflow.add_edge("retrieve", "filter")

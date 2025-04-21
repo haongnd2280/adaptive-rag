@@ -25,3 +25,7 @@ answer:
 hallu:
   model: gpt-4.1-mini
   temperature: 0.0
+
+common:
+  model: gpt-4.1-mini
+  temperature: 0.0
